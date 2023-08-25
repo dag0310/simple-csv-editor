@@ -1,0 +1,3 @@
+command,shutters_seconds,time,offset
+shutters_down,10,sunset,60
+shutters_up,,09:00

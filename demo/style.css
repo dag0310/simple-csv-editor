@@ -1,0 +1,14 @@
+.csvInput {
+  width: 100%;
+}
+
+.editor table {
+  font-family: monospace;
+  border: 1px solid black;
+  width: 100%;
+}
+.editor table tr td {
+  width: 40px;
+  height: 40px;
+  border: 1px solid black;
+}

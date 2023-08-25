@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple CSV Editor</title>
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+<h1>Simple CSV Editor</h1>
+
+<textarea id="textArea" class="csvInput" rows="10" autocomplete="off">
+command,shutters_seconds,time,offset
+shutters_down,10,sunset,60
+shutters_up,,09:00
+</textarea>
+
+<div id="simpleCsvEditor" class="editor"></div>
+
+<script type="module">
+import SimpleCsvEditor from '../src/simple-csv-editor.js';
+
+const textArea = document.getElementById('textArea');
+
+const simpleCsvEditor = new SimpleCsvEditor({
+  id: 'simpleCsvEditor',
+  onChange: (csvData) => { textArea.value = csvData; },
+});
+
+textArea.addEventListener('input', event => {
+  simpleCsvEditor.setCsv(event.target.value);
+});
+simpleCsvEditor.setCsv(textArea.value);
+</script>
+</body>
+</html>
