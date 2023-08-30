@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 .csvInput {
   width: 100%;
 }
