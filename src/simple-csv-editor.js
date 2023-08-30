@@ -47,6 +47,13 @@ class SimpleCsvEditor {
     this.setCsv(data);
   }
 
+  #triggerOnChange() {
+    if (this.onChange == null) {
+      return;
+    }
+    this.onChange(this.getCsv());
+  }
+
   #registerControls(controlsParam, enableDefaultControls) {
     const controlsElement = this.editor.appendChild(document.createElement('div'));
     controlsElement.className = SimpleCsvEditor.controlsClassName;
@@ -65,21 +72,97 @@ class SimpleCsvEditor {
 
       newButton.addEventListener('click', () => {
         this.controlDefinitions.get(newButton.className)();
-        if (this.onChange != null) {
-          this.onChange(this.getCsv());
-        }
+        this.#triggerOnChange();
       });
     }
+  }
+
+  static #checkCursorPosition(cell) {
+    const selection = window.getSelection();
+    if (selection.rangeCount === 0) {
+      return null;
+    }
+
+    const range = selection.getRangeAt(0);
+    const startNode = range.startContainer;
+    const { startOffset } = range;
+    const endNode = range.endContainer;
+    const { endOffset } = range;
+
+    if (startNode === cell.firstChild && startOffset === 0) {
+      return 'start';
+    }
+    if (endNode === cell.lastChild && endOffset === cell.lastChild.textContent.length) {
+      return 'end';
+    }
+    return 'middle';
+  }
+
+  static #jumpToPositionInCellGeneric(cell, idx) {
+    if (cell == null) {
+      return;
+    }
+    if (cell.firstChild == null) {
+      cell.appendChild(document.createTextNode(''));
+    }
+    const textNode = cell.firstChild;
+    const range = document.createRange();
+    range.setStart(textNode, idx);
+    range.collapse(true);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  static #jumpToStartOfCell(cell) {
+    this.#jumpToPositionInCellGeneric(cell, 0);
+  }
+
+  static #jumpToEndOfCell(cell) {
+    this.#jumpToPositionInCellGeneric(cell, cell?.firstChild?.textContent.length);
   }
 
   #addCellToRow(row, cellIdx = -1) {
     const newCell = row.insertCell(cellIdx);
     newCell.contentEditable = true;
-    if (this.onChange != null) {
-      newCell.addEventListener('input', () => {
-        this.onChange(this.getCsv());
-      });
-    }
+    newCell.addEventListener('input', () => {
+      this.#triggerOnChange();
+    });
+    newCell.addEventListener('keydown', (event) => {
+      const rowIdx = event.target.parentElement.rowIndex;
+      const { rows } = row.parentElement;
+      switch (event.key) {
+        case 'Enter': {
+          event.preventDefault();
+          const newRowIdx = (event.shiftKey) ? rowIdx : rowIdx + 1;
+          this.addRow(newRowIdx);
+          rows[newRowIdx].cells[newCell.cellIndex].focus();
+          this.#triggerOnChange();
+          break;
+        }
+        case 'ArrowUp':
+          event.preventDefault();
+          SimpleCsvEditor.#jumpToEndOfCell(rows[rowIdx - 1]?.cells[newCell.cellIndex]);
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          SimpleCsvEditor.#jumpToEndOfCell(rows[rowIdx + 1]?.cells[newCell.cellIndex]);
+          break;
+        case 'ArrowLeft':
+          if (SimpleCsvEditor.#checkCursorPosition(newCell) === 'start') {
+            event.preventDefault();
+            SimpleCsvEditor.#jumpToEndOfCell(row.cells[newCell.cellIndex - 1]);
+          }
+          break;
+        case 'ArrowRight':
+          if (SimpleCsvEditor.#checkCursorPosition(newCell) === 'end') {
+            event.preventDefault();
+            SimpleCsvEditor.#jumpToStartOfCell(row.cells[newCell.cellIndex + 1]);
+          }
+          break;
+        default: // Do nothing
+      }
+    });
   }
 
   setCsv(data) {
@@ -118,8 +201,9 @@ class SimpleCsvEditor {
   }
 
   addRow(rowIdx = -1) {
+    const firstRow = (this.table.rows.length > 0) ? this.table.rows[0] : null;
     const newRow = this.table.insertRow(rowIdx);
-    for (let cellIdx = 0; cellIdx < this.table.rows[0].cells.length; cellIdx += 1) {
+    for (let cellIdx = 0; cellIdx < (firstRow ?? newRow).cells.length; cellIdx += 1) {
       this.#addCellToRow(newRow);
     }
   }
