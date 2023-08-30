@@ -28,7 +28,6 @@ class SimpleCsvEditor {
     if (this.editor == null) {
       throw new Error(`No editor element found with id="${id}"`);
     }
-    this.editor.innerHTML = '';
 
     this.#registerControls(controls, enableDefaultControls);
     this.table = this.editor.appendChild(document.createElement('table'));
