@@ -26,7 +26,7 @@ class SimpleCsvEditor {
     }
     this.editor = document.getElementById(id);
     if (this.editor == null) {
-      throw new Error(`No editor div element found with id="${id}"`);
+      throw new Error(`No editor element found with id="${id}"`);
     }
     this.editor.innerHTML = '';
 
