@@ -15,9 +15,12 @@ class SimpleCsvEditor {
     onChange = null,
     controls = null,
     enableDefaultControls = false,
-    valueSeparator = ',',
-    newLineCharacter = '\n',
+    delimiter = ',',
+    quoteChar = '"',
   }) {
+    if (Papa == null) {
+      throw new Error('PapaParse dependency needs to be included beforehand');
+    }
     if (id == null) {
       throw new Error('No editorId specified in config');
     }
@@ -30,9 +33,15 @@ class SimpleCsvEditor {
     this.#registerControls(controls, enableDefaultControls);
     this.table = this.editor.appendChild(document.createElement('table'));
 
-    this.valueSeparator = valueSeparator;
-    this.newLineCharacter = newLineCharacter;
     this.onChange = onChange;
+
+    this.papaParseConfig = {
+      delimiter,
+      quoteChar,
+      header: false,
+      dynamicTyping: false,
+      skipEmptyLines: true,
+    };
 
     this.setCsv(data);
   }
@@ -72,21 +81,28 @@ class SimpleCsvEditor {
     }
   }
 
-  setCsv(csvData) {
+  setCsv(data) {
+    const result = Papa.parse(data, this.papaParseConfig);
+    if (result.errors.length > 0) {
+      for (const error of result.errors) {
+        console.error(error);
+      }
+      return;
+    }
+
+    this.detectedLineBreak = result.meta.linebreak;
+
     this.table.innerHTML = '';
-    const lines = csvData.split(this.newLineCharacter);
 
-    for (let lineIdx = 0; lineIdx < lines.length; lineIdx += 1) {
-      const tokens = lines[lineIdx].split(this.valueSeparator);
-
-      for (let tokenIdx = 0; tokenIdx < tokens.length; tokenIdx += 1) {
+    for (const [lineIdx, lineTokens] of result.data.entries()) {
+      for (const [tokenIdx, token] of lineTokens.entries()) {
         if (this.table.rows[lineIdx] == null) {
           this.addRow();
         }
         if (this.table.rows[lineIdx].cells[tokenIdx] == null) {
           this.addColumn();
         }
-        this.table.rows[lineIdx].cells[tokenIdx].textContent = tokens[tokenIdx];
+        this.table.rows[lineIdx].cells[tokenIdx].textContent = token;
       }
     }
   }
@@ -95,8 +111,8 @@ class SimpleCsvEditor {
     return Array.from(this.table.rows)
       .map((row) => Array.from(row.cells)
         .map((cell) => cell.textContent)
-        .join(this.valueSeparator))
-      .join(this.newLineCharacter);
+        .join(this.papaParseConfig.delimiter))
+      .join(this.detectedLineBreak);
   }
 
   addRow(rowIdx = -1) {
