@@ -1,22 +1,10 @@
 class SimpleCsvEditor {
-  static controlsClassName = 'controls';
-
-  controlDefinitions = new Map([
-    ['addRowBtn',       () => { this.addRow(); }],
-    ['addColumnBtn',    () => { this.addColumn(); }],
-    ['deleteRowBtn',    () => { this.deleteRow(); }],
-    ['deleteColumnBtn', () => { this.deleteColumn(); }],
-    ['clearBtn',        () => { this.setCsv(''); }],
-  ]);
-
   constructor({
     id,
     data = '',
     onChange = null,
     delimiter = null,
     quoteChar = '"',
-    controls = null,
-    enableDefaultControls = false,
   }) {
     if (Papa == null) {
       throw new Error('PapaParse dependency needs to be included beforehand');
@@ -29,7 +17,6 @@ class SimpleCsvEditor {
       throw new Error(`No editor element found with id="${id}"`);
     }
 
-    this.#registerControls(controls, enableDefaultControls);
     this.table = this.editor.appendChild(document.createElement('table'));
 
     this.onChange = onChange;
@@ -52,29 +39,6 @@ class SimpleCsvEditor {
       return;
     }
     this.onChange(this.getCsv());
-  }
-
-  #registerControls(controlsParam, enableDefaultControls) {
-    const controlsElement = this.editor.appendChild(document.createElement('div'));
-    controlsElement.className = SimpleCsvEditor.controlsClassName;
-
-    const controls = controlsParam ?? (enableDefaultControls
-      ? Array.from(this.controlDefinitions.keys()).map((className) => ({
-        className,
-        label: className,
-      }))
-      : []);
-
-    for (const control of controls) {
-      const newButton = controlsElement.appendChild(document.createElement('button'));
-      newButton.className = control.className;
-      newButton.textContent = control.label;
-
-      newButton.addEventListener('click', () => {
-        this.controlDefinitions.get(newButton.className)();
-        this.#triggerOnChange();
-      });
-    }
   }
 
   static #checkCursorPosition(cell) {
