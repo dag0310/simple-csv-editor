@@ -13,10 +13,10 @@ class SimpleCsvEditor {
     id,
     data = '',
     onChange = null,
-    controls = null,
-    enableDefaultControls = false,
     delimiter = null,
     quoteChar = '"',
+    controls = null,
+    enableDefaultControls = false,
   }) {
     if (Papa == null) {
       throw new Error('PapaParse dependency needs to be included beforehand');
