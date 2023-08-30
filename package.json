@@ -1,6 +1,6 @@
 {
   "name": "simple-csv-editor",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A table editor for easily editing and retrieving CSV data.",
   "main": "src/simple-csv-editor.js",
   "type": "module",
