@@ -91,6 +91,7 @@ class SimpleCsvEditor {
     }
 
     this.detectedLineBreak = result.meta.linebreak;
+    this.lastLineEmpty = data.slice(-1) === this.detectedLineBreak;
 
     this.table.innerHTML = '';
 
@@ -112,7 +113,7 @@ class SimpleCsvEditor {
       .map((row) => Array.from(row.cells)
         .map((cell) => cell.textContent)
         .join(this.papaParseConfig.delimiter))
-      .join(this.detectedLineBreak);
+      .join(this.detectedLineBreak) + (this.lastLineEmpty ? this.detectedLineBreak : '');
   }
 
   addRow(rowIdx = -1) {
