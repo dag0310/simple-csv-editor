@@ -15,7 +15,7 @@ class SimpleCsvEditor {
     onChange = null,
     controls = null,
     enableDefaultControls = false,
-    delimiter = ',',
+    delimiter = null,
     quoteChar = '"',
   }) {
     if (Papa == null) {
@@ -36,12 +36,14 @@ class SimpleCsvEditor {
     this.onChange = onChange;
 
     this.papaParseConfig = {
-      delimiter,
       quoteChar,
       header: false,
       dynamicTyping: false,
       skipEmptyLines: true,
     };
+    if (delimiter != null) {
+      this.papaParseConfig.delimiter = delimiter;
+    }
 
     this.setCsv(data);
   }

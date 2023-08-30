@@ -22,12 +22,14 @@ Here is a basic HTML setup which should cover most needs:
 import SimpleCsvEditor from './simple-csv-editor.js';
 
 // Initializes the editor with config parameters:
-// id:       Set according to the editor HTML element's id attribute
-// onChange: This function will be executed everytime a change happens inside the editor.
-//           The paramater will contain the current CSV representation of the editor.
+// id:        Set according to the editor HTML element's id attribute
+// onChange:  This function will be executed everytime a change happens inside the editor.
+//            The paramater will contain the current CSV representation of the editor.
+// delimiter: If not set it will be auto-detected, you might want to supply the delimiter to get consistent behavior.
 const simpleCsvEditor = new SimpleCsvEditor({
   id: 'simpleCsvEditor',
   onChange: (csvData) => { console.log(csvData); },
+  delimiter: ',',
 });
 
 // Set the CSV data. maybe check out the demo, you might want to set this using a text area or some other way.
