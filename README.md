@@ -48,6 +48,14 @@ one,two,three,four`);
 
 For all public methods, properties and further constructor config parameters check out `src/simple-csv-editor.js` - it should be very readable 😜
 
+## Versioning
+
+This project uses semantic versioning.
+
+- Major version change: Expect breaking changes
+- Minor version change: New features
+- Patch version change: Minor bugfixes, Refactoring, etc.
+
 ## Dependencies
 
 - [PapaParse](https://www.papaparse.com)
