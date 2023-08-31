@@ -1,13 +1,13 @@
 {
   "env": {
     "browser": true,
-    "es2023": true
+    "es2022": true
   },
   "extends": [
     "airbnb-base"
   ],
   "parserOptions": {
-    "ecmaVersion": 2023
+    "ecmaVersion": 2022
   },
   "rules": {
     "no-multi-spaces": 0,
