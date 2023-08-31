@@ -14,7 +14,9 @@ Here is a basic HTML setup which should cover most needs:
 <!-- The element in which the table editor will be displayed -->
 <div id="simpleCsvEditor"></div>
 
-<!-- PapaParse dependency, very important for the editor to work! -->
+<!-- PapaParse CSV parser dependency - very important for the editor to work!
+Of course you can also use the library via "npm i papaparse" or download it yourself.
+At least the vendored version here guarantees compatibility with the editor. -->
 <script src="papaparse.min.js"></script>
 
 <!-- ES module declaration -->
