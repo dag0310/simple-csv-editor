@@ -6,6 +6,12 @@ A table editor for easily editing and retrieving CSV data.
 
 [Demo page](https://dag0310.github.io/simple-csv-editor/demo/) - can be found under `demo/index.html`
 
+## Installation
+
+```bash
+npm install --save simple-csv-editor
+```
+
 ## Usage
 
 Here is a basic HTML setup which should cover most needs:
