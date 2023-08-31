@@ -12,10 +12,19 @@
     "url": "git+https://github.com/dag0310/simple-csv-editor.git"
   },
   "keywords": [
+    "simple",
     "csv",
     "editor",
-    "js",
-    "es-modules"
+    "json",
+    "module",
+    "synchronized",
+    "synced",
+    "html",
+    "table",
+    "papaparse",
+    "parser",
+    "unstyled",
+    "api"
   ],
   "author": "Daniel Geymayer",
   "license": "MIT",
