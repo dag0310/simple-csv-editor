@@ -23,13 +23,13 @@ const textArea = document.getElementById('textArea');
 
 const simpleCsvEditor = new SimpleCsvEditor({
   id: 'simpleCsvEditor',
+  data: textArea.value,
   onChange: (csvData) => { textArea.value = csvData; },
 });
 
 textArea.addEventListener('input', event => {
   simpleCsvEditor.setCsv(event.target.value);
 });
-simpleCsvEditor.setCsv(textArea.value);
 </script>
 </body>
 </html>
