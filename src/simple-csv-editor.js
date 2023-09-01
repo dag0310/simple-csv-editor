@@ -126,28 +126,7 @@ class SimpleCsvEditor {
     cell.appendChild(this.#buildAddRowButton(1, this.controlLabels.addRowAfter));
   }
 
-  static #checkCursorPosition(cell) {
-    const selection = window.getSelection();
-    if (selection.rangeCount === 0) {
-      return null;
-    }
-
-    const range = selection.getRangeAt(0);
-    const startNode = range.startContainer;
-    const { startOffset } = range;
-    const endNode = range.endContainer;
-    const { endOffset } = range;
-
-    if (startNode === cell.firstChild && startOffset === 0) {
-      return 'start';
-    }
-    if (endNode === cell.lastChild && endOffset === cell.lastChild.textContent.length) {
-      return 'end';
-    }
-    return 'middle';
-  }
-
-  static #jumpToPositionInCellGeneric(cell, cellIndex) {
+  static #jumpToEndOfCell(cell) {
     if (cell == null) {
       return;
     }
@@ -156,19 +135,11 @@ class SimpleCsvEditor {
     }
     const textNode = cell.firstChild;
     const range = document.createRange();
-    range.setStart(textNode, cellIndex);
+    range.setStart(textNode, cell?.firstChild?.textContent.length);
     range.collapse(true);
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
-  }
-
-  static #jumpToStartOfCell(cell) {
-    this.#jumpToPositionInCellGeneric(cell, 0);
-  }
-
-  static #jumpToEndOfCell(cell) {
-    this.#jumpToPositionInCellGeneric(cell, cell?.firstChild?.textContent.length);
   }
 
   #addDataCellToRow(row, cellIndex) {
@@ -194,18 +165,6 @@ class SimpleCsvEditor {
         case 'ArrowDown':
           event.preventDefault();
           SimpleCsvEditor.#jumpToEndOfCell(rows[row.rowIndex + 1]?.cells[newCell.cellIndex]);
-          break;
-        case 'ArrowLeft':
-          if (SimpleCsvEditor.#checkCursorPosition(newCell) === 'start') {
-            event.preventDefault();
-            SimpleCsvEditor.#jumpToEndOfCell(row.cells[newCell.cellIndex - 1]);
-          }
-          break;
-        case 'ArrowRight':
-          if (SimpleCsvEditor.#checkCursorPosition(newCell) === 'end') {
-            event.preventDefault();
-            SimpleCsvEditor.#jumpToStartOfCell(row.cells[newCell.cellIndex + 1]);
-          }
           break;
         default: // Do nothing
       }
