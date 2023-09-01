@@ -3,6 +3,20 @@ class SimpleCsvEditor {
     id,
     data = '',
     onChange = null,
+    warnOnDelete = true,
+    showControls = true,
+    controlLabels = {
+      addRowBefore: '+ ↑',
+      addRowAfter: '+ ↓',
+      addColumnBefore: '+ ←',
+      addColumnAfter: '+ →',
+      deleteRow: '✖',
+      deleteColumn: '✖',
+      deleteAll: '✖',
+      deleteRowWarning: 'DELETE THIS ROW?',
+      deleteColumnWarning: 'DELETE THIS COLUMN?',
+      deleteAllWarning: 'DELETE ALL DATA?',
+    },
     delimiter = null,
     quoteChar = '"',
   }) {
@@ -20,6 +34,9 @@ class SimpleCsvEditor {
     this.table = this.editor.appendChild(document.createElement('table'));
 
     this.onChange = onChange;
+    this.warnOnDelete = warnOnDelete;
+    this.showControls = showControls;
+    this.controlLabels = controlLabels;
 
     this.papaParseConfig = {
       quoteChar,
@@ -39,6 +56,74 @@ class SimpleCsvEditor {
       return;
     }
     this.onChange(this.getCsv());
+  }
+
+  static #buildBasicButton(label) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.innerText = label;
+    button.tabIndex = -1;
+    return button;
+  }
+
+  #buildAddRowButton(offsetIdx, label) {
+    const button = SimpleCsvEditor.#buildBasicButton(label);
+    button.addEventListener('click', (event) => {
+      this.addRow(event.target.parentElement.parentElement.rowIndex + offsetIdx);
+    });
+    return button;
+  }
+
+  #buildAddColumnButton(offsetIdx, label) {
+    const button = SimpleCsvEditor.#buildBasicButton(label);
+    button.addEventListener('click', (event) => {
+      this.addColumn(event.target.parentElement.cellIndex + offsetIdx);
+    });
+    return button;
+  }
+
+  #buildDeleteRowButton(label) {
+    const button = SimpleCsvEditor.#buildBasicButton(label);
+    button.addEventListener('click', (event) => {
+      if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteRowWarning)) {
+        this.deleteRow(event.target.parentElement.parentElement.rowIndex);
+      }
+    });
+    return button;
+  }
+
+  #buildDeleteColumnButton(label) {
+    const button = SimpleCsvEditor.#buildBasicButton(label);
+    button.addEventListener('click', (event) => {
+      if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteColumnWarning)) {
+        this.deleteColumn(event.target.parentElement.cellIndex);
+      }
+    });
+    return button;
+  }
+
+  #buildDeleteAllButton(label) {
+    const button = SimpleCsvEditor.#buildBasicButton(label);
+    button.addEventListener('click', () => {
+      if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteAllWarning)) {
+        this.deleteAll();
+      }
+    });
+    return button;
+  }
+
+  #addColumnControlCell(row, cellIdx) {
+    const cell = row.insertCell(cellIdx);
+    cell.appendChild(this.#buildAddColumnButton(0, this.controlLabels.addColumnBefore));
+    cell.appendChild(this.#buildDeleteColumnButton(this.controlLabels.deleteColumn));
+    cell.appendChild(this.#buildAddColumnButton(1, this.controlLabels.addColumnAfter));
+  }
+
+  #addRowControlCell(row, cellIdx) {
+    const cell = row.insertCell(cellIdx);
+    cell.appendChild(this.#buildAddRowButton(0, this.controlLabels.addRowBefore));
+    cell.appendChild(this.#buildDeleteRowButton(this.controlLabels.deleteRow));
+    cell.appendChild(this.#buildAddRowButton(1, this.controlLabels.addRowAfter));
   }
 
   static #checkCursorPosition(cell) {
@@ -86,31 +171,29 @@ class SimpleCsvEditor {
     this.#jumpToPositionInCellGeneric(cell, cell?.firstChild?.textContent.length);
   }
 
-  #addCellToRow(row, cellIdx = -1) {
+  #addDataCellToRow(row, cellIdx) {
     const newCell = row.insertCell(cellIdx);
     newCell.contentEditable = true;
     newCell.addEventListener('input', () => {
       this.#triggerOnChange();
     });
     newCell.addEventListener('keydown', (event) => {
-      const rowIdx = event.target.parentElement.rowIndex;
       const { rows } = row.parentElement;
       switch (event.key) {
         case 'Enter': {
           event.preventDefault();
-          const newRowIdx = (event.shiftKey) ? rowIdx : rowIdx + 1;
+          const newRowIdx = event.shiftKey ? row.rowIndex : row.rowIndex + 1;
           this.addRow(newRowIdx);
           rows[newRowIdx].cells[newCell.cellIndex].focus();
-          this.#triggerOnChange();
           break;
         }
         case 'ArrowUp':
           event.preventDefault();
-          SimpleCsvEditor.#jumpToEndOfCell(rows[rowIdx - 1]?.cells[newCell.cellIndex]);
+          SimpleCsvEditor.#jumpToEndOfCell(rows[row.rowIndex - 1]?.cells[newCell.cellIndex]);
           break;
         case 'ArrowDown':
           event.preventDefault();
-          SimpleCsvEditor.#jumpToEndOfCell(rows[rowIdx + 1]?.cells[newCell.cellIndex]);
+          SimpleCsvEditor.#jumpToEndOfCell(rows[row.rowIndex + 1]?.cells[newCell.cellIndex]);
           break;
         case 'ArrowLeft':
           if (SimpleCsvEditor.#checkCursorPosition(newCell) === 'start') {
@@ -129,13 +212,21 @@ class SimpleCsvEditor {
     });
   }
 
+  getCsv() {
+    return Array.from(this.table.rows).slice(this.showControls ? 1 : 0)
+      .map((row) => Array.from(row.cells).slice(0, this.showControls ? -1 : undefined)
+        .map((cell) => cell.textContent)
+        .join(this.papaParseConfig.delimiter))
+      .join(this.detectedLineBreak) + (this.lastLineEmpty ? this.detectedLineBreak : '');
+  }
+
   setCsv(data) {
     const result = Papa.parse(data, this.papaParseConfig);
-    if (result.errors.length > 0) {
-      for (const error of result.errors) {
-        console.error(error);
+    for (const error of result.errors) {
+      if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
+        continue;
       }
-      return;
+      console.error(error);
     }
 
     this.detectedLineBreak = result.meta.linebreak;
@@ -146,52 +237,85 @@ class SimpleCsvEditor {
     for (const [lineIdx, lineTokens] of result.data.entries()) {
       for (const [tokenIdx, token] of lineTokens.entries()) {
         if (this.table.rows[lineIdx] == null) {
-          this.addRow();
+          const numCells = (lineIdx <= 0) ? lineTokens.length : this.table.rows[lineIdx - 1].cells.length;
+          const newRow = this.table.insertRow(-1);
+          for (let cellIdx = 0; cellIdx < numCells; cellIdx += 1) {
+            this.#addDataCellToRow(newRow, -1);
+          }
         }
         if (this.table.rows[lineIdx].cells[tokenIdx] == null) {
-          this.addColumn();
+          for (const row of this.table.rows) {
+            this.#addDataCellToRow(row, -1);
+          }
         }
         this.table.rows[lineIdx].cells[tokenIdx].textContent = token;
       }
     }
+    if (this.table.rows.length <= 0) {
+      this.#addDataCellToRow(this.table.insertRow(0), 0);
+    }
+    if (this.showControls) {
+      const columnControlsRow = this.table.insertRow(0);
+      for (let cellIdx = 0; cellIdx < this.table.rows[1].cells.length; cellIdx += 1) {
+        this.#addColumnControlCell(columnControlsRow, -1);
+      }
+      for (const row of this.table.rows) {
+        if (row.rowIndex === 0) {
+          row.insertCell(-1).appendChild(this.#buildDeleteAllButton(this.controlLabels.deleteAll));
+        } else {
+          this.#addRowControlCell(row, -1);
+        }
+      }
+    }
   }
 
-  getCsv() {
-    return Array.from(this.table.rows)
-      .map((row) => Array.from(row.cells)
-        .map((cell) => cell.textContent)
-        .join(this.papaParseConfig.delimiter))
-      .join(this.detectedLineBreak) + (this.lastLineEmpty ? this.detectedLineBreak : '');
-  }
-
-  addRow(rowIdx = -1) {
-    const firstRow = (this.table.rows.length > 0) ? this.table.rows[0] : null;
+  addRow(rowIdx) {
+    const firstDataRowIdx = this.showControls ? 1 : 0;
+    const firstDataRow = (this.table.rows.length > firstDataRowIdx) ? this.table.rows[firstDataRowIdx] : null;
     const newRow = this.table.insertRow(rowIdx);
-    for (let cellIdx = 0; cellIdx < (firstRow ?? newRow).cells.length; cellIdx += 1) {
-      this.#addCellToRow(newRow);
+    const numCells = (firstDataRow ?? newRow).cells.length;
+    for (let cellIdx = 0; cellIdx < numCells; cellIdx += 1) {
+      if (this.showControls && cellIdx === numCells - 1) {
+        this.#addRowControlCell(newRow, -1);
+      } else {
+        this.#addDataCellToRow(newRow, -1);
+      }
     }
+    this.#triggerOnChange();
   }
 
-  addColumn(cellIdx = -1) {
+  addColumn(cellIdx) {
     for (const row of this.table.rows) {
-      this.#addCellToRow(row, cellIdx);
+      if (this.showControls && row.rowIndex === 0) {
+        this.#addColumnControlCell(row, cellIdx);
+      } else {
+        this.#addDataCellToRow(row, cellIdx);
+      }
     }
+    this.#triggerOnChange();
   }
 
-  deleteRow(rowIdx = -1) {
-    if (this.table.rows.length <= 1) {
+  deleteRow(rowIdx) {
+    if (this.table.rows.length <= (this.showControls ? 2 : 1)) {
       return;
     }
     this.table.deleteRow(rowIdx);
+    this.#triggerOnChange();
   }
 
-  deleteColumn(cellIdx = -1) {
-    if (this.table.rows[0].cells.length <= 1) {
+  deleteColumn(columnIdx) {
+    if (this.table.rows[0].cells.length <= (this.showControls ? 2 : 1)) {
       return;
     }
     for (const row of this.table.rows) {
-      row.deleteCell(cellIdx);
+      row.deleteCell(columnIdx);
     }
+    this.#triggerOnChange();
+  }
+
+  deleteAll() {
+    this.setCsv('');
+    this.#triggerOnChange();
   }
 }
 

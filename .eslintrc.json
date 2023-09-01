@@ -15,7 +15,17 @@
     "import/no-extraneous-dependencies": 0,
     "import/extensions": 0,
     "no-new": 0,
-    "no-console": ["error", { "allow": ["error"] }]
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "error"
+        ]
+      }
+    ],
+    "no-continue": 0,
+    "no-alert": 0,
+    "max-len": 0
   },
   "globals": {
     "Papa": true
