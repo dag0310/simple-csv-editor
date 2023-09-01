@@ -66,18 +66,18 @@ class SimpleCsvEditor {
     return button;
   }
 
-  #buildAddRowButton(offsetIdx, label) {
+  #buildAddRowButton(offsetIndex, label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
     button.addEventListener('click', (event) => {
-      this.addRow(event.target.parentElement.parentElement.rowIndex + offsetIdx);
+      this.addRow(event.target.parentElement.parentElement.rowIndex + offsetIndex);
     });
     return button;
   }
 
-  #buildAddColumnButton(offsetIdx, label) {
+  #buildAddColumnButton(offsetIndex, label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
     button.addEventListener('click', (event) => {
-      this.addColumn(event.target.parentElement.cellIndex + offsetIdx);
+      this.addColumn(event.target.parentElement.cellIndex + offsetIndex);
     });
     return button;
   }
@@ -112,15 +112,15 @@ class SimpleCsvEditor {
     return button;
   }
 
-  #addColumnControlCell(row, cellIdx) {
-    const cell = row.insertCell(cellIdx);
+  #addColumnControlCell(row, cellIndex) {
+    const cell = row.insertCell(cellIndex);
     cell.appendChild(this.#buildAddColumnButton(0, this.controlLabels.addColumnBefore));
     cell.appendChild(this.#buildDeleteColumnButton(this.controlLabels.deleteColumn));
     cell.appendChild(this.#buildAddColumnButton(1, this.controlLabels.addColumnAfter));
   }
 
-  #addRowControlCell(row, cellIdx) {
-    const cell = row.insertCell(cellIdx);
+  #addRowControlCell(row, cellIndex) {
+    const cell = row.insertCell(cellIndex);
     cell.appendChild(this.#buildAddRowButton(0, this.controlLabels.addRowBefore));
     cell.appendChild(this.#buildDeleteRowButton(this.controlLabels.deleteRow));
     cell.appendChild(this.#buildAddRowButton(1, this.controlLabels.addRowAfter));
@@ -147,7 +147,7 @@ class SimpleCsvEditor {
     return 'middle';
   }
 
-  static #jumpToPositionInCellGeneric(cell, idx) {
+  static #jumpToPositionInCellGeneric(cell, cellIndex) {
     if (cell == null) {
       return;
     }
@@ -156,7 +156,7 @@ class SimpleCsvEditor {
     }
     const textNode = cell.firstChild;
     const range = document.createRange();
-    range.setStart(textNode, idx);
+    range.setStart(textNode, cellIndex);
     range.collapse(true);
     const selection = window.getSelection();
     selection.removeAllRanges();
@@ -171,8 +171,8 @@ class SimpleCsvEditor {
     this.#jumpToPositionInCellGeneric(cell, cell?.firstChild?.textContent.length);
   }
 
-  #addDataCellToRow(row, cellIdx) {
-    const newCell = row.insertCell(cellIdx);
+  #addDataCellToRow(row, cellIndex) {
+    const newCell = row.insertCell(cellIndex);
     newCell.contentEditable = true;
     newCell.addEventListener('input', () => {
       this.#triggerOnChange();
@@ -182,9 +182,9 @@ class SimpleCsvEditor {
       switch (event.key) {
         case 'Enter': {
           event.preventDefault();
-          const newRowIdx = event.shiftKey ? row.rowIndex : row.rowIndex + 1;
-          this.addRow(newRowIdx);
-          rows[newRowIdx].cells[newCell.cellIndex].focus();
+          const newRowIndex = event.shiftKey ? row.rowIndex : row.rowIndex + 1;
+          this.addRow(newRowIndex);
+          rows[newRowIndex].cells[newCell.cellIndex].focus();
           break;
         }
         case 'ArrowUp':
@@ -241,21 +241,21 @@ class SimpleCsvEditor {
 
     this.table.innerHTML = '';
 
-    for (const [lineIdx, lineTokens] of result.data.entries()) {
-      for (const [tokenIdx, token] of lineTokens.entries()) {
-        if (this.table.rows[lineIdx] == null) {
-          const numCells = (lineIdx <= 0) ? lineTokens.length : this.table.rows[lineIdx - 1].cells.length;
+    for (const [lineIndex, lineTokens] of result.data.entries()) {
+      for (const [tokenIndex, token] of lineTokens.entries()) {
+        if (this.table.rows[lineIndex] == null) {
+          const numCells = (lineIndex <= 0) ? lineTokens.length : this.table.rows[lineIndex - 1].cells.length;
           const newRow = this.table.insertRow(-1);
-          for (let cellIdx = 0; cellIdx < numCells; cellIdx += 1) {
+          for (let cellIndex = 0; cellIndex < numCells; cellIndex += 1) {
             this.#addDataCellToRow(newRow, -1);
           }
         }
-        if (this.table.rows[lineIdx].cells[tokenIdx] == null) {
+        if (this.table.rows[lineIndex].cells[tokenIndex] == null) {
           for (const row of this.table.rows) {
             this.#addDataCellToRow(row, -1);
           }
         }
-        this.table.rows[lineIdx].cells[tokenIdx].textContent = token;
+        this.table.rows[lineIndex].cells[tokenIndex].textContent = token;
       }
     }
     if (this.table.rows.length <= 0) {
@@ -263,7 +263,7 @@ class SimpleCsvEditor {
     }
     if (this.showControls) {
       const columnControlsRow = this.table.insertRow(0);
-      for (let cellIdx = 0; cellIdx < this.table.rows[1].cells.length; cellIdx += 1) {
+      for (let cellIndex = 0; cellIndex < this.table.rows[1].cells.length; cellIndex += 1) {
         this.#addColumnControlCell(columnControlsRow, -1);
       }
       for (const row of this.table.rows) {
@@ -276,13 +276,13 @@ class SimpleCsvEditor {
     }
   }
 
-  addRow(rowIdx) {
-    const firstDataRowIdx = this.showControls ? 1 : 0;
-    const firstDataRow = (this.table.rows.length > firstDataRowIdx) ? this.table.rows[firstDataRowIdx] : null;
-    const newRow = this.table.insertRow(rowIdx);
+  addRow(rowIndex) {
+    const firstDataRowIndex = this.showControls ? 1 : 0;
+    const firstDataRow = (this.table.rows.length > firstDataRowIndex) ? this.table.rows[firstDataRowIndex] : null;
+    const newRow = this.table.insertRow(rowIndex);
     const numCells = (firstDataRow ?? newRow).cells.length;
-    for (let cellIdx = 0; cellIdx < numCells; cellIdx += 1) {
-      if (this.showControls && cellIdx === numCells - 1) {
+    for (let cellIndex = 0; cellIndex < numCells; cellIndex += 1) {
+      if (this.showControls && cellIndex === numCells - 1) {
         this.#addRowControlCell(newRow, -1);
       } else {
         this.#addDataCellToRow(newRow, -1);
@@ -291,31 +291,31 @@ class SimpleCsvEditor {
     this.#triggerOnChange();
   }
 
-  addColumn(cellIdx) {
+  addColumn(cellIndex) {
     for (const row of this.table.rows) {
       if (this.showControls && row.rowIndex === 0) {
-        this.#addColumnControlCell(row, cellIdx);
+        this.#addColumnControlCell(row, cellIndex);
       } else {
-        this.#addDataCellToRow(row, cellIdx);
+        this.#addDataCellToRow(row, cellIndex);
       }
     }
     this.#triggerOnChange();
   }
 
-  deleteRow(rowIdx) {
+  deleteRow(rowIndex) {
     if (this.table.rows.length <= (this.showControls ? 2 : 1)) {
       return;
     }
-    this.table.deleteRow(rowIdx);
+    this.table.deleteRow(rowIndex);
     this.#triggerOnChange();
   }
 
-  deleteColumn(columnIdx) {
+  deleteColumn(columnIndex) {
     if (this.table.rows[0].cells.length <= (this.showControls ? 2 : 1)) {
       return;
     }
     for (const row of this.table.rows) {
-      row.deleteCell(columnIdx);
+      row.deleteCell(columnIndex);
     }
     this.#triggerOnChange();
   }
