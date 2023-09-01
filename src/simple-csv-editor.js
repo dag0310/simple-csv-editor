@@ -213,11 +213,17 @@ class SimpleCsvEditor {
   }
 
   getCsv() {
-    return Array.from(this.table.rows).slice(this.showControls ? 1 : 0)
+    const stringsInArraysOfArrays = Array.from(this.table.rows).slice(this.showControls ? 1 : 0)
       .map((row) => Array.from(row.cells).slice(0, this.showControls ? -1 : undefined)
-        .map((cell) => cell.textContent)
-        .join(this.papaParseConfig.delimiter))
-      .join(this.detectedLineBreak) + (this.lastLineEmpty ? this.detectedLineBreak : '');
+        .map((cell) => cell.textContent));
+
+    const config = {
+      delimiter: this.delimiterUsed,
+      header: false,
+      skipEmptyLines: 'greedy',
+    };
+
+    return Papa.unparse(stringsInArraysOfArrays, config) + (this.lastLineEmpty ? this.lineBreakUsed : '');
   }
 
   setCsv(data) {
@@ -229,8 +235,9 @@ class SimpleCsvEditor {
       console.error(error);
     }
 
-    this.detectedLineBreak = result.meta.linebreak;
-    this.lastLineEmpty = data.slice(-1) === this.detectedLineBreak;
+    this.lineBreakUsed = result.meta.linebreak;
+    this.delimiterUsed = result.meta.delimiter;
+    this.lastLineEmpty = data.slice(-1) === this.lineBreakUsed;
 
     this.table.innerHTML = '';
 
