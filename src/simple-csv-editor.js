@@ -19,16 +19,19 @@ class SimpleCsvEditor {
     },
     delimiter = null,
     quoteChar = '"',
-  }) {
+  } = {}) {
     if (Papa == null) {
       throw new Error('PapaParse dependency needs to be included beforehand');
     }
     if (id == null) {
-      throw new Error('No editorId specified in config');
-    }
-    this.editor = document.getElementById(id);
-    if (this.editor == null) {
-      throw new Error(`No editor element found with id="${id}"`);
+      this.editor = document.createElement('div');
+      this.editor.id = 'simpleCsvEditor';
+      document.body.appendChild(this.editor);
+    } else {
+      this.editor = document.getElementById(id);
+      if (this.editor == null) {
+        throw new Error(`No editor element found like <div id="${id}"></div>`);
+      }
     }
 
     this.table = this.editor.appendChild(document.createElement('table'));
