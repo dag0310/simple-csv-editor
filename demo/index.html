@@ -24,7 +24,7 @@ const textArea = document.getElementById('textArea');
 const simpleCsvEditor = new SimpleCsvEditor({
   id: 'simpleCsvEditor',
   data: textArea.value,
-  onChange: (csvData) => { textArea.value = csvData; },
+  onChange: (data) => { textArea.value = data; },
 });
 
 textArea.addEventListener('input', event => {
