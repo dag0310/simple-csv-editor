@@ -2,7 +2,7 @@
   box-sizing: border-box;
 }
 
-.csvInput {
+textarea {
   width: 100%;
 }
 
