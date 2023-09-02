@@ -26,6 +26,7 @@
     "no-alert": 0,
     "max-len": 0
   },
+  "ignorePatterns": ["vendor/**"],
   "overrides": [
     {
       "files": ["*.test.js"],
