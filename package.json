@@ -5,8 +5,11 @@
   "main": "src/simple-csv-editor.js",
   "type": "module",
   "scripts": {
+    "precommit-msg": "echo 'Pre-commit checks ...' && exit 0",
+    "lint": "eslint ./src ./test --cache --ignore-pattern .gitignore",
     "test": "mocha"
   },
+  "pre-commit": [ "precommit-msg", "lint", "test" ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dag0310/simple-csv-editor.git"
@@ -37,6 +40,7 @@
     "eslint": "^8.48.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.28.1",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "pre-commit": "^1.2.2"
   }
 }
