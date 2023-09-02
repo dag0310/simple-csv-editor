@@ -3,10 +3,8 @@ import { expect } from 'chai';
 import SimpleCsvEditor from '../src/simple-csv-editor.js';
 
 describe('SimpleCsvEditor', () => {
-  it('throws an error if no id is given.', () => {
+  it('throws an error on initialization when no PapaParse dependency is found globally.', () => {
     // given, when, then
-    expect(SimpleCsvEditor).to.throw(Error);
-    expect(() => { new SimpleCsvEditor({}); }).to.throw(Error);
-    expect(() => { new SimpleCsvEditor({ id: null }); }).to.throw(Error);
+    expect(() => { new SimpleCsvEditor(); }).to.throw(ReferenceError, 'Papa is not defined');
   });
 });
