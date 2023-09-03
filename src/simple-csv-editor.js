@@ -20,7 +20,7 @@ class SimpleCsvEditor {
     delimiter = null,
     quoteChar = '"',
   } = {}) {
-    if (Papa == null) {
+    if (window.Papa == null) {
       throw new Error('PapaParse dependency needs to be included beforehand');
     }
     this.editor = document.getElementById(id);
@@ -181,11 +181,11 @@ class SimpleCsvEditor {
       skipEmptyLines: 'greedy',
     };
 
-    return Papa.unparse(stringsInArraysOfArrays, config) + (this.lastLineEmpty ? this.lineBreakUsed : '');
+    return window.Papa.unparse(stringsInArraysOfArrays, config) + (this.lastLineEmpty ? this.lineBreakUsed : '');
   }
 
   setCsv(data) {
-    const result = Papa.parse(data, this.papaParseConfig);
+    const result = window.Papa.parse(data, this.papaParseConfig);
     for (const error of result.errors) {
       if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
         continue;

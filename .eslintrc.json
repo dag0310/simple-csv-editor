@@ -34,8 +34,5 @@
           "no-new": 0
         }
     }
-  ],
-  "globals": {
-    "Papa": true
-  }
+  ]
 }
