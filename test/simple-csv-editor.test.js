@@ -92,4 +92,17 @@ describe('SimpleCsvEditor', () => {
     // then
     expect(simpleCsvEditor.getCsv()).to.equal('one,two,three\n1,2,');
   });
+
+  it('escapes CSV data correctly.', () => {
+    // given
+    setupDom('<div id="myEditor"></div>');
+    global.window.Papa = Papa;
+    const data = 'one,two,three\n1,2,3\n1.0,"2,0",3.0\n"""one""","""""two""""","""""""three"""""""';
+
+    // when
+    const simpleCsvEditor = new SimpleCsvEditor({ id: 'myEditor', data });
+
+    // then
+    expect(simpleCsvEditor.getCsv()).to.equal(data);
+  });
 });
