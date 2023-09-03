@@ -21,11 +21,11 @@ class SimpleCsvEditor {
     quoteChar = '"',
   } = {}) {
     if (window.Papa == null) {
-      throw new Error('PapaParse dependency needs to be included beforehand');
+      throw new ReferenceError('Papa is not defined');
     }
     this.editor = document.getElementById(id);
     if (this.editor == null) {
-      throw new Error(`No editor element found like <div id="${id}"></div>`);
+      throw new ReferenceError(`No editor element found like <div id="${id}"></div>`);
     }
 
     this.table = this.editor.appendChild(document.createElement('table'));
