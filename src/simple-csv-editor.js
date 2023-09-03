@@ -66,6 +66,7 @@ class SimpleCsvEditor {
   #buildAddRowButton(offsetIndex, label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
     button.addEventListener('click', (event) => {
+      event.preventDefault();
       this.addRow(event.target.parentElement.parentElement.rowIndex + offsetIndex);
     });
     return button;
@@ -74,6 +75,7 @@ class SimpleCsvEditor {
   #buildAddColumnButton(offsetIndex, label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
     button.addEventListener('click', (event) => {
+      event.preventDefault();
       this.addColumn(event.target.parentElement.cellIndex + offsetIndex);
     });
     return button;
@@ -82,6 +84,7 @@ class SimpleCsvEditor {
   #buildDeleteRowButton(label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
     button.addEventListener('click', (event) => {
+      event.preventDefault();
       if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteRowWarning)) {
         this.deleteRow(event.target.parentElement.parentElement.rowIndex);
       }
@@ -92,6 +95,7 @@ class SimpleCsvEditor {
   #buildDeleteColumnButton(label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
     button.addEventListener('click', (event) => {
+      event.preventDefault();
       if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteColumnWarning)) {
         this.deleteColumn(event.target.parentElement.cellIndex);
       }
@@ -101,7 +105,8 @@ class SimpleCsvEditor {
 
   #buildDeleteAllButton(label) {
     const button = SimpleCsvEditor.#buildBasicButton(label);
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
       if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteAllWarning)) {
         this.deleteAll();
       }
