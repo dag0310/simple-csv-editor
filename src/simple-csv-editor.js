@@ -55,16 +55,17 @@ class SimpleCsvEditor {
     this.onChange(this.getCsv());
   }
 
-  static #buildBasicButton(label) {
+  #buildBasicButton(labelKey) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.innerText = label;
     button.tabIndex = -1;
+    button.className = labelKey;
+    button.innerText = this.controlLabels[labelKey];
     return button;
   }
 
-  #buildAddRowButton(offsetIndex, label) {
-    const button = SimpleCsvEditor.#buildBasicButton(label);
+  #buildAddRowButton(offsetIndex, labelKey) {
+    const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
       event.preventDefault();
       this.addRow(event.target.parentElement.parentElement.rowIndex + offsetIndex);
@@ -72,8 +73,8 @@ class SimpleCsvEditor {
     return button;
   }
 
-  #buildAddColumnButton(offsetIndex, label) {
-    const button = SimpleCsvEditor.#buildBasicButton(label);
+  #buildAddColumnButton(offsetIndex, labelKey) {
+    const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
       event.preventDefault();
       this.addColumn(event.target.parentElement.cellIndex + offsetIndex);
@@ -81,8 +82,8 @@ class SimpleCsvEditor {
     return button;
   }
 
-  #buildDeleteRowButton(label) {
-    const button = SimpleCsvEditor.#buildBasicButton(label);
+  #buildDeleteRowButton(labelKey) {
+    const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
       event.preventDefault();
       if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteRowWarning)) {
@@ -92,8 +93,8 @@ class SimpleCsvEditor {
     return button;
   }
 
-  #buildDeleteColumnButton(label) {
-    const button = SimpleCsvEditor.#buildBasicButton(label);
+  #buildDeleteColumnButton(labelKey) {
+    const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
       event.preventDefault();
       if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteColumnWarning)) {
@@ -103,8 +104,8 @@ class SimpleCsvEditor {
     return button;
   }
 
-  #buildDeleteAllButton(label) {
-    const button = SimpleCsvEditor.#buildBasicButton(label);
+  #buildDeleteAllButton(labelKey) {
+    const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
       event.preventDefault();
       if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteAllWarning)) {
@@ -116,17 +117,17 @@ class SimpleCsvEditor {
 
   #addColumnControlCell(row, cellIndex) {
     const cell = document.createElement('th');
-    cell.appendChild(this.#buildAddColumnButton(0, this.controlLabels.addColumnBefore));
-    cell.appendChild(this.#buildDeleteColumnButton(this.controlLabels.deleteColumn));
-    cell.appendChild(this.#buildAddColumnButton(1, this.controlLabels.addColumnAfter));
+    cell.appendChild(this.#buildAddColumnButton(0, 'addColumnBefore'));
+    cell.appendChild(this.#buildDeleteColumnButton('deleteColumn'));
+    cell.appendChild(this.#buildAddColumnButton(1, 'addColumnAfter'));
     row.insertBefore(cell, row.cells[cellIndex]);
   }
 
   #addRowControlCell(row, cellIndex) {
     const cell = document.createElement('th');
-    cell.appendChild(this.#buildAddRowButton(0, this.controlLabels.addRowBefore));
-    cell.appendChild(this.#buildDeleteRowButton(this.controlLabels.deleteRow));
-    cell.appendChild(this.#buildAddRowButton(1, this.controlLabels.addRowAfter));
+    cell.appendChild(this.#buildAddRowButton(0, 'addRowBefore'));
+    cell.appendChild(this.#buildDeleteRowButton('deleteRow'));
+    cell.appendChild(this.#buildAddRowButton(1, 'addRowAfter'));
     row.insertBefore(cell, row.cells[cellIndex]);
   }
 
@@ -233,7 +234,7 @@ class SimpleCsvEditor {
       for (const row of this.table.rows) {
         if (row.rowIndex === 0) {
           const cell = document.createElement('th');
-          cell.appendChild(this.#buildDeleteAllButton(this.controlLabels.deleteAll));
+          cell.appendChild(this.#buildDeleteAllButton('deleteAll'));
           row.appendChild(cell);
         } else {
           this.#addRowControlCell(row, -1);
