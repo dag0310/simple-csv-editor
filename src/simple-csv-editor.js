@@ -110,17 +110,19 @@ class SimpleCsvEditor {
   }
 
   #addColumnControlCell(row, cellIndex) {
-    const cell = row.insertCell(cellIndex);
+    const cell = document.createElement('th');
     cell.appendChild(this.#buildAddColumnButton(0, this.controlLabels.addColumnBefore));
     cell.appendChild(this.#buildDeleteColumnButton(this.controlLabels.deleteColumn));
     cell.appendChild(this.#buildAddColumnButton(1, this.controlLabels.addColumnAfter));
+    row.insertBefore(cell, row.cells[cellIndex]);
   }
 
   #addRowControlCell(row, cellIndex) {
-    const cell = row.insertCell(cellIndex);
+    const cell = document.createElement('th');
     cell.appendChild(this.#buildAddRowButton(0, this.controlLabels.addRowBefore));
     cell.appendChild(this.#buildDeleteRowButton(this.controlLabels.deleteRow));
     cell.appendChild(this.#buildAddRowButton(1, this.controlLabels.addRowAfter));
+    row.insertBefore(cell, row.cells[cellIndex]);
   }
 
   static #jumpToEndOfCell(cell) {
@@ -224,7 +226,9 @@ class SimpleCsvEditor {
       }
       for (const row of this.table.rows) {
         if (row.rowIndex === 0) {
-          row.insertCell(-1).appendChild(this.#buildDeleteAllButton(this.controlLabels.deleteAll));
+          const cell = document.createElement('th');
+          cell.appendChild(this.#buildDeleteAllButton(this.controlLabels.deleteAll));
+          row.appendChild(cell);
         } else {
           this.#addRowControlCell(row, -1);
         }

@@ -11,8 +11,10 @@ textarea {
   border-collapse: collapse;
   width: 100%;
 }
-.editor table tr td {
+.editor table tr td, .editor table tr th {
   width: 40px;
   height: 40px;
+}
+.editor table tr td {
   border: 1px solid black;
 }
