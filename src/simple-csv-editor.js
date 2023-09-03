@@ -48,7 +48,17 @@ class SimpleCsvEditor {
     this.setCsv(data);
   }
 
+  #setDeleteButtonDisabledStates() {
+    for (const button of this.table.getElementsByClassName('deleteRow')) {
+      button.disabled = this.table.rows.length === (this.showControls ? 2 : 1);
+    }
+    for (const button of this.table.getElementsByClassName('deleteColumn')) {
+      button.disabled = this.table.rows[0].cells.length === (this.showControls ? 2 : 1);
+    }
+  }
+
   #triggerOnChange() {
+    this.#setDeleteButtonDisabledStates();
     if (this.onChange == null) {
       return;
     }
@@ -241,6 +251,7 @@ class SimpleCsvEditor {
         }
       }
     }
+    this.#setDeleteButtonDisabledStates();
   }
 
   addRow(rowIndex) {
