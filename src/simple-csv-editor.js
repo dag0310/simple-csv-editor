@@ -178,6 +178,7 @@ class SimpleCsvEditor {
     const config = {
       delimiter: this.delimiterUsed,
       header: false,
+      newline: this.lineBreakUsed,
       skipEmptyLines: 'greedy',
     };
 
