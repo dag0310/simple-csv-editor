@@ -16,6 +16,8 @@ class SimpleCsvEditor {
       deleteRowWarning: 'Delete this row?',
       deleteColumnWarning: 'Delete this column?',
       deleteAllWarning: 'Delete all cells?',
+      deleteButton: 'Delete',
+      cancelButton: 'Cancel',
     },
     delimiter = null,
     quoteChar = '"',
@@ -77,7 +79,6 @@ class SimpleCsvEditor {
   #buildAddRowButton(offsetIndex, labelKey) {
     const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
-      event.preventDefault();
       this.addRow(event.target.parentElement.parentElement.rowIndex + offsetIndex);
     });
     return button;
@@ -86,43 +87,69 @@ class SimpleCsvEditor {
   #buildAddColumnButton(offsetIndex, labelKey) {
     const button = this.#buildBasicButton(labelKey);
     button.addEventListener('click', (event) => {
-      event.preventDefault();
       this.addColumn(event.target.parentElement.cellIndex + offsetIndex);
     });
     return button;
   }
 
-  #buildDeleteRowButton(labelKey) {
-    const button = this.#buildBasicButton(labelKey);
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteRowWarning)) {
-        this.deleteRow(event.target.parentElement.parentElement.rowIndex);
+  #buildDeleteDialog(text, deleteFunction) {
+    const dialog = document.createElement('dialog');
+    dialog.innerText = text;
+
+    const form = document.createElement('form');
+    dialog.appendChild(form);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.value = 'cancel';
+    cancelBtn.formMethod = 'dialog';
+    cancelBtn.innerText = this.controlLabels.cancelButton;
+    form.appendChild(cancelBtn);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.value = 'default';
+    deleteBtn.innerText = this.controlLabels.deleteButton;
+    form.appendChild(deleteBtn);
+
+    dialog.addEventListener('close', (event) => {
+      if (event.target.returnValue === 'delete') {
+        deleteFunction();
       }
     });
+
+    deleteBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      dialog.close('delete');
+    });
+
+    return dialog;
+  }
+
+  #buildDeleteButton(button, deleteWarning, deleteFunction) {
+    const dialog = this.#buildDeleteDialog(deleteWarning, deleteFunction);
+    button.addEventListener('click', () => {
+      if (this.warnOnDelete) {
+        dialog.showModal();
+      } else {
+        deleteFunction();
+      }
+    });
+    button.appendChild(dialog);
     return button;
+  }
+
+  #buildDeleteRowButton(labelKey) {
+    const button = this.#buildBasicButton(labelKey);
+    return this.#buildDeleteButton(button, this.controlLabels.deleteRowWarning, () => { this.deleteRow(button.parentElement.parentElement.rowIndex); });
   }
 
   #buildDeleteColumnButton(labelKey) {
     const button = this.#buildBasicButton(labelKey);
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteColumnWarning)) {
-        this.deleteColumn(event.target.parentElement.cellIndex);
-      }
-    });
-    return button;
+    return this.#buildDeleteButton(button, this.controlLabels.deleteColumnWarning, () => { this.deleteColumn(button.parentElement.cellIndex); });
   }
 
   #buildDeleteAllButton(labelKey) {
     const button = this.#buildBasicButton(labelKey);
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      if (!this.warnOnDelete || window.confirm(this.controlLabels.deleteAllWarning)) {
-        this.deleteAll();
-      }
-    });
-    return button;
+    return this.#buildDeleteButton(button, this.controlLabels.deleteAllWarning, () => { this.deleteAll(); });
   }
 
   #addColumnControlCell(row, cellIndex) {
