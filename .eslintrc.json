@@ -9,30 +9,41 @@
   "parserOptions": {
     "ecmaVersion": 2022
   },
+  "ignorePatterns": [
+    "vendor/**"
+  ],
   "rules": {
     "no-multi-spaces": 0,
     "no-restricted-syntax": 0,
-    "import/no-extraneous-dependencies": 0,
-    "import/extensions": 0,
-    "no-console": [
-      "error",
-      {
-        "allow": [
-          "error"
-        ]
-      }
-    ],
-    "no-continue": 0,
-    "no-alert": 0,
-    "max-len": 0
+    "max-len": 0,
+    "no-continue": 0
   },
-  "ignorePatterns": ["vendor/**"],
   "overrides": [
     {
-      "files": ["*.test.js"],
-        "rules": {
-          "no-new": 0
-        }
+      "files": [
+        "src/**/*.js"
+      ],
+      "rules": {
+        "no-console": [
+          "error",
+          {
+            "allow": [
+              "error"
+            ]
+          }
+        ],
+        "no-alert": 0
+      }
+    },
+    {
+      "files": [
+        "test/**/*.js"
+      ],
+      "rules": {
+        "import/no-extraneous-dependencies": 0,
+        "import/extensions": 0,
+        "no-new": 0
+      }
     }
   ]
 }
