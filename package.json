@@ -9,7 +9,10 @@
     "lint": "eslint ./src ./test --cache --ignore-pattern .gitignore",
     "test": "mocha"
   },
-  "pre-commit": [ "lint", "test" ],
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dag0310/simple-csv-editor.git"
