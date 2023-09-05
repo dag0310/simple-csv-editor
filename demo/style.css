@@ -11,15 +11,21 @@ textarea {
   width: 100%;
 }
 
+.editor {
+  overflow: auto;
+}
 .editor table {
   font-family: monospace;
   border-collapse: collapse;
   width: 100%;
 }
 .editor table tr td, .editor table tr th {
-  width: 40px;
-  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
 }
 .editor table tr td {
   border: 1px solid black;
+}
+.editor table tr th {
+  white-space: nowrap;
 }
