@@ -236,12 +236,6 @@ class SimpleCsvEditor {
 
   setCsv(data) {
     const result = window.Papa.parse(data, this.papaParseConfig);
-    for (const error of result.errors) {
-      if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
-        continue;
-      }
-      console.error(error);
-    }
 
     this.lineBreakUsed = result.meta.linebreak;
     this.delimiterUsed = result.meta.delimiter;
@@ -285,6 +279,8 @@ class SimpleCsvEditor {
       }
     }
     this.#setDeleteButtonDisabledStates();
+
+    return result.errors;
   }
 
   addRow(rowIndex) {
