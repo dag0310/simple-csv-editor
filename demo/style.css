@@ -27,5 +27,6 @@ textarea {
   border: 1px solid black;
 }
 .editor table tr th {
+  border-left: 1px solid transparent;
   white-space: nowrap;
 }
