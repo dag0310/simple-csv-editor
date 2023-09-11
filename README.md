@@ -43,6 +43,9 @@ const simpleCsvEditor = new SimpleCsvEditor({
 // Set the CSV data. maybe check out the demo, you might want to set this using a text area or some other way.
 simpleCsvEditor.setCsv(`1,2,3,4
 one,two,three,four`);
+
+// Fetch the data again from the table
+const csvData = simpleCsvEditor.getCsv();
 </script>
 ```
 
