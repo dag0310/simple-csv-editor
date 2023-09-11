@@ -216,7 +216,7 @@ class SimpleCsvEditor {
   getCsv() {
     const stringsInArraysOfArrays = Array.from(this.table.rows).slice(this.showControls ? 1 : 0)
       .map((row) => Array.from(row.cells).slice(0, this.showControls ? -1 : undefined)
-        .map((cell) => cell.textContent));
+        .map((cell) => cell.innerText));
 
     const config = {
       delimiter: this.delimiterUsed,
@@ -257,7 +257,7 @@ class SimpleCsvEditor {
             this.#addDataCellToRow(row, -1);
           }
         }
-        this.table.rows[lineIndex].cells[tokenIndex].textContent = token;
+        this.table.rows[lineIndex].cells[tokenIndex].innerText = token;
       }
     }
     if (this.table.rows.length <= 0) {
