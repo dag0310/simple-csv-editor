@@ -187,6 +187,12 @@ class SimpleCsvEditor {
   #addDataCellToRow(row, cellIndex) {
     const newCell = row.insertCell(cellIndex);
     newCell.contentEditable = true;
+    if (document.execCommand != null) {
+      newCell.addEventListener('paste', (event) => {
+        event.preventDefault();
+        document.execCommand('insertHTML', false, event.clipboardData.getData('text/plain'));
+      });
+    }
     newCell.addEventListener('input', () => {
       this.#triggerOnChange();
     });
