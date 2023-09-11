@@ -36,6 +36,7 @@ import SimpleCsvEditor from './simple-csv-editor.js';
 // delimiter: If not set it will be auto-detected, you might want to supply the delimiter to get consistent behavior.
 const simpleCsvEditor = new SimpleCsvEditor({
   id: 'simpleCsvEditor',
+  data: '1,2,3', // init with data already
   onChange: (csvData) => { console.log(csvData); },
   delimiter: ',',
 });
